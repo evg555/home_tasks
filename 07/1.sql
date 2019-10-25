@@ -14,7 +14,7 @@ select from_user_id, count(from_user_id) as 'cnt' from messages where to_user_id
 /* - Подсчитать общее количество лайков, которые получили пользователи младше 10 лет.. */
 
 select count(*) as 'cnt_likes' from likes where user_id in (
-	select user_id from profiles where TIMESTAMPDIFF(YEAR, birthday, now()) > 18
+	select user_id from profiles where TIMESTAMPDIFF(YEAR, birthday, now()) < 18
 )
 
 
