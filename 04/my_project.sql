@@ -34,32 +34,31 @@ create table `groups` (
 
 drop table if exists users_groups;
 create table users_groups (
-	users_id bigint unsigned,
-	groups_id bigint unsigned,
+	user_id bigint unsigned,
+	group_id bigint unsigned,
 	
-	PRIMARY KEY (users_id, groups_id),
+	PRIMARY KEY (user_id, group_id),
 	
-	foreign key (users_id) REFERENCES users(id),
-	foreign key (groups_id) REFERENCES `groups`(id)
+	foreign key (user_id) REFERENCES users(id),
+	foreign key (group_id) REFERENCES `groups`(id)
 );
 
 
 drop table if exists profiles;
 create table profiles (
 	id serial,
-	users_id bigint unsigned,
+	user_id bigint unsigned,
 	photo_id bigint unsigned,
 	birthdate datetime,
 	gender enum('M','F'),
 	activity varchar(150),
 	about text,	
 	
-	foreign key (users_id) REFERENCES users(id),
+	foreign key (user_id) REFERENCES users(id),
 	
 	index(birthdate),
 	index(gender)
 );
-
 
 
 drop table if exists courses;
@@ -67,6 +66,47 @@ create table courses (
 	id serial,
 	title varchar(100) not null,
 	user_id bigint unsigned,
+	created_at datetime default now(),
+	updated_at datetime default now(),	
 	price int,
-	rating float
+	rating float,
+	
+	foreign key (user_id) REFERENCES users(id),
+	
+	index(title),
+	index(price),
+	index(rating)
 );
+
+
+drop table if exists lessons;
+create table lessons (
+	id serial,
+	course_id bigint unsigned,
+	title varchar(100) not null,
+	created_at datetime default now(),
+	updated_at datetime default now(),	
+	
+	foreign key (course_id) REFERENCES courses(id),
+	
+	index(title)
+);
+
+drop table if exists content;
+create table content (
+	id serial,
+	lesson_id bigint unsigned,
+	name varchar(100) not null,
+	content_type enum('text','video','audio'),
+	body text,
+	link varchar(255),
+	created_at datetime default now(),
+	updated_at datetime default now(),	
+	
+	foreign key (lesson_id) REFERENCES lessons(id),
+	
+	index(name),
+	index(content_type)
+);
+
+
