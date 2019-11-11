@@ -6,8 +6,28 @@
 
 drop table if exists logs;
 create table logs (
-	table_name varchar(150),
+	`table` varchar(150),
 	row_id bigint unsigned,
-	row_name varchar(150),
-	created_at datetime default now()
-) ENGINE=ARCHIVE;
+	name varchar(150),
+	created_at datetime default current_timestamp
+) engine=Archive;
+
+
+delimiter //
+
+create trigger insert_from_users after insert on users for each row
+begin
+	insert into logs values ('users', new.id, new.name, now());
+end//
+
+create trigger insert_from_catalogs after insert on catalogs for each row
+begin
+	insert into logs values ('catalogs', new.id, new.name, now());
+end//
+
+create trigger insert_from_products after insert on products for each row
+begin
+	insert into logs values ('products', new.id, new.name, now());
+end//
+
+delimiter ;
