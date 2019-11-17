@@ -48,7 +48,7 @@ drop table if exists profiles;
 create table profiles (
 	id serial,
 	user_id bigint unsigned,
-	photo_id bigint unsigned,
+	photo_id bigint unsigned unique,
 	birthdate datetime,
 	gender enum('M','F'),
 	activity varchar(150),
@@ -65,13 +65,13 @@ drop table if exists courses;
 create table courses (
 	id serial,
 	title varchar(100) not null,
-	user_id bigint unsigned,
+	author_id bigint unsigned,
 	created_at datetime default now(),
 	updated_at datetime default now(),	
 	price int,
 	rating float,
 	
-	foreign key (user_id) REFERENCES users(id),
+	foreign key (author_id) REFERENCES users(id),
 	
 	index(title),
 	index(price),
@@ -169,23 +169,7 @@ create table feedbacks (
 	course_id bigint unsigned,	
 	title varchar(150) default '', 
 	body text,
-	
-	foreign key (user_id) REFERENCES users(id),
-	foreign key (course_id) REFERENCES courses(id),
-	
-	index(user_id),
-	index(course_id)	
-);
-
-
-
-drop table if exists feedbacks;
-create table feedbacks (
-	id serial,
-	user_id bigint unsigned,		
-	course_id bigint unsigned,	
-	title varchar(150) default '', 
-	body text,
+	created_at datetime DEFAULT CURRENT_TIMESTAMP,
 	
 	foreign key (user_id) REFERENCES users(id),
 	foreign key (course_id) REFERENCES courses(id),
