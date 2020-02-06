@@ -1,7 +1,7 @@
 # 1. Развернуть у себя на компьютере/виртуальной машине/хостинге MongoDB
 # и реализовать функцию, записывающую собранные вакансии в созданную БД
 
-from lesson2.jobs import get_from_hh, get_fom_sj
+from lesson2.jobs import get_from_hh, get_from_sj
 from pymongo import MongoClient
 
 def insert_to_DB(collection_name, data):
@@ -26,5 +26,5 @@ jobs = get_from_hh(vacancy, jobs)
 insert_to_DB('hh',jobs)
 
 jobs = []
-jobs = get_fom_sj(vacancy, jobs)
+jobs = get_from_sj(vacancy, jobs)
 insert_to_DB('sj',jobs)

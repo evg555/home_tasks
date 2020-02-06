@@ -47,8 +47,8 @@ def get_from_hh(vacancy, jobs):
 			salary_str = job.find('div', {'data-qa': 'vacancy-serp__vacancy-compensation'})
 
 			if not salary_str:
-				job_data['min_salary'] = 0
-				job_data['max_salary'] = 0
+				job_data['min_salary'] = False
+				job_data['max_salary'] = False
 			else:
 				salary_all = re.search('\d(.*)\d', salary_str.getText())[0].replace(u'\xa0', u'')
 				salary = salary_all.split('-')
@@ -62,12 +62,12 @@ def get_from_hh(vacancy, jobs):
 					job_data['max_salary'] = int(salary[1])
 				elif salary_part[0].lower() == 'от':
 					job_data['min_salary'] = int(salary_all)
-					job_data['max_salary'] = 0
+					job_data['max_salary'] = 9999999999
 				elif salary_part[0].lower() == 'до':
 					job_data['min_salary'] = 0
 					job_data['max_salary'] = int(salary_all)
 				else:
-					job_data['min_salary'] = int(salary_all)
+					job_data['min_salary'] = 0
 					job_data['max_salary'] = int(salary_all)
 
 				job_data['currency'] = salary_part[-1]
@@ -81,7 +81,7 @@ def get_from_hh(vacancy, jobs):
 	return jobs
 
 # Парсим superjob.ru
-def get_fom_sj(vacancy, jobs):
+def get_from_sj(vacancy, jobs):
 	sj_main_link = 'https://www.superjob.ru'
 	headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0'}
 	page = 1
@@ -110,8 +110,8 @@ def get_fom_sj(vacancy, jobs):
 			salary_str = job.find('span', {'class': 'f-test-text-company-item-salary'})
 
 			if not salary_str or salary_str.getText() == 'По договорённости':
-				job_data['min_salary'] = 0
-				job_data['max_salary'] = 0
+				job_data['min_salary'] = False
+				job_data['max_salary'] = False
 			else:
 				salary_all = re.search('\d(.*)\d', salary_str.getText())[0].replace(u'\xa0', u'')
 				salary = salary_all.split('—')
@@ -125,12 +125,12 @@ def get_fom_sj(vacancy, jobs):
 					job_data['max_salary'] = int(salary[1])
 				elif salary_part[0].lower() == 'от':
 					job_data['min_salary'] = int(salary_all)
-					job_data['max_salary'] = 0
+					job_data['max_salary'] = 9999999999
 				elif salary_part[0].lower() == 'до':
 					job_data['min_salary'] = 0
 					job_data['max_salary'] = int(salary_all)
 				else:
-					job_data['min_salary'] = int(salary_all)
+					job_data['min_salary'] = 0
 					job_data['max_salary'] = int(salary_all)
 
 				job_data['currency'] = salary_part[-1]
@@ -150,7 +150,7 @@ if __name__ == '__main__':
 
 	jobs = []
 	jobs = get_from_hh(vacancy, jobs)
-	jobs = get_fom_sj(vacancy, jobs)
+	jobs = get_from_sj(vacancy, jobs)
 
 	df = pd.DataFrame(jobs)
 	df.to_csv('jobs.csv')
