@@ -116,7 +116,7 @@ def get_news_from_mail(news):
 			if not source:
 				new_data['source'] = 'mail.ru'
 			else:
-				new_data['source'] = source
+				new_data['source'] = source[0]
 
 			news.append(new_data)
 	except:
