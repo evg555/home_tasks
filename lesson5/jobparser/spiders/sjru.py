@@ -3,26 +3,26 @@ import scrapy
 from scrapy.http import HtmlResponse
 from lesson5.jobparser.items import JobparserItem
 
-class HhruSpider(scrapy.Spider):
-    name = 'hhru'
-    allowed_domains = ['hh.ru']
-    start_urls = [f'https://hh.ru/search/vacancy?area=&st=searchVacancy&text=python']
+class SjruSpider(scrapy.Spider):
+    name = 'sjru'
+    allowed_domains = ['superjob.ru']
+    start_urls = [f'https://superjob.ru/vacancy/search?keywords=python']
 
     def parse(self, response: HtmlResponse):
-        next_page = response.css('a.HH-Pager-Controls-Next::attr(href)').extract_first()
+        next_page = response.css('a.f-test-button-dalshe::attr(href)').extract_first()
         yield response.follow(next_page, callback=self.parse)
 
         vacancy = response.css(
-            'div.vacancy-serp div.vacancy-serp-item div.vacancy-serp-item__row_header a.bloko-link::attr(href)'
+            'div.f-test-vacancy-item a.icMQ_::attr(href)'
         ).extract()
 
         for link in vacancy:
             yield response.follow(link, callback=self.vacancy_parse)
 
     def vacancy_parse(self, response: HtmlResponse):
-        source = 'hh.ru'
-        title = response.css('div.vacancy-title h1.header::text').extract_first()
-        salary = response.css('div.vacancy-title p.vacancy-salary::text').extract()
+        source = 'sj.ru'
+        title = response.css('div.f-test-vacancy-base-info h1.s1nFK::text').extract_first()
+        salary = response.xpath("//span[@class='_3mfro _2Wp8I ZON4b PlM3e _2JVkc']/text() | //span[@class='_3mfro _2Wp8I ZON4b PlM3e _2JVkc']//span/text()").extract()
         salary_parse = self.salary_parse(salary)
 
         yield JobparserItem(
@@ -44,18 +44,17 @@ class HhruSpider(scrapy.Spider):
         else:
             if len(salary) > 2:
                 if salary[0].lower().strip() == 'от':
-                    item['min_salary'] = int(salary[1].replace(u'\xa0', u''))
-
-                    if salary[2].lower().strip() == 'до':
-                        item['max_salary'] = int(salary[3].replace(u'\xa0', u''))
-                        item['currency'] = salary[5]
-                    else:
-                        item['max_salary'] = 999999999999
-                        item['currency'] = salary[3]
-                if salary[0].lower() == 'до':
+                    item['min_salary'] = int(salary[2].replace(u'\xa0', u''))
+                    item['max_salary'] = 999999999999
+                    item['currency'] = salary[4]
+                elif salary[0].lower() == 'до':
                     item['min_salary'] = 0
-                    item['max_salary'] = int(salary[1].replace(u'\xa0', u''))
-                    item['currency'] = salary[3]
+                    item['max_salary'] = int(salary[2].replace(u'\xa0', u''))
+                    item['currency'] = salary[4]
+                else:
+                    item['min_salary'] = int(salary[0].replace(u'\xa0', u''))
+                    item['max_salary'] = int(salary[4].replace(u'\xa0', u''))
+                    item['currency'] = salary[6]
             else:
                 item['min_salary'] = False
                 item['max_salary'] = False
