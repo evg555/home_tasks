@@ -10,7 +10,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 chrome_options = Options()
 chrome_options.add_argument('--start-maximized')
-driver = webdriver.Chrome(options=chrome_options)
+driver = webdriver.Chrome()
 
 driver.get('https://mvideo.ru/')
 assert 'М.Видео' in driver.title
@@ -26,9 +26,24 @@ except:
 
 
 hit_items = WebDriverWait(driver, 10).until(
-	EC.presence_of_all_elements_located((By.CLASS_NAME, "accessories-carousel-holder"))
+	EC.presence_of_element_located((By.CLASS_NAME, "sel-hits-block"))
 )
 
 actions = ActionChains(driver)
-actions.move_to_element(hit_items[2]).perform()
-arrow = driver.find_element_by_class_name("sel-hits-button-next").click()
+actions.move_to_element(hit_items).perform()
+arrow = hit_items.find_element_by_class_name("sel-hits-button-next")
+
+while arrow.is_displayed():
+	arrow.click()
+
+items = hit_items.find_elements_by_class_name('gallery-list-item')
+
+for item in items:
+	title = item.find_element_by_class_name('sel-product-tile-title').text()
+	print(title)
+	break
+
+
+
+
+
